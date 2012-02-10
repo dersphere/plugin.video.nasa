@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+    <!-- Root menu entries -->
+    <string id="30100">Nasa TV (live)</string>
+    <string id="30101">Recent Videos</string>
+
+    <!-- Search -->
+    <string id="30200">Search for Video</string>
+    <string id="30201">Enter title or topic</string>
+</strings>
