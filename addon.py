@@ -78,13 +78,16 @@ def show_videos_by_topic(topic_id):
               'thumbnail': video['thumbnail'],
               'info': {'originaltitle': video['title'],
                        'duration': video['duration'],
-                       'plot': video['description']},
+                       'plot': video['description'],
+                       'date': video['date'],
+                       'size': video['filesize'],
+                       'credits': video['author']},
               'url': plugin.url_for('play', id=video['id']),
               'is_folder': False,
               'is_playable': True,
              } for video in videos]
     __log('show_videos_by_topic finished')
-    return plugin.add_items(items)
+    return plugin.add_items(items, sort_method_ids=(37, 3, 4, 8))
 
 
 @plugin.route('/video/<id>/')

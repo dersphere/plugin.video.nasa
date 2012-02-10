@@ -84,6 +84,9 @@ class NasaScraper(object):
                    'duration': self.__format_duration(v['duration']),
                    'thumbnail': v['thumbnail'][0]['url'],
                    'description': v['description'],
+                   'date': self.__format_date(v['date_published_start']),
+                   'filesize': int(v['formats']['format'][-1]['filesize']),
+                   'author': v['author'],
                    'id': v['id'],
                   } for v in json_data['media']]
         total_count = json_data['total_count']
@@ -167,8 +170,16 @@ class NasaScraper(object):
         log('__get_json finished')
         return json_obj
 
-    def __format_duration(self, seconds):
-        return str(datetime.timedelta(seconds=int(seconds)))
+    def __format_duration(self, seconds_str):
+        '''returns 'HH:MM:SS' '''
+        return str(datetime.timedelta(seconds=int(seconds_str)))
+
+    def __format_date(self, date_str):
+        '''returns 'DD.MM.YYY' '''
+        # there is a python/xbmc bug which prevents using datetime twice
+        # so doing it ugly :(
+        year, month, day = date_str[0:10].split('-')
+        return '%s.%s.%s' % (day, month, year)
 
 
 def log(text):
