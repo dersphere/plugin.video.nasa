@@ -87,6 +87,7 @@ class NasaScraper(object):
                    'date': self.__format_date(v['date_published_start']),
                    'filesize': int(v['formats']['format'][-1]['filesize']),
                    'author': v['author'],
+                   'genres': [g['name'] for g in v['genres']],
                    'id': v['id'],
                   } for v in json_data['media']]
         total_count = json_data['total_count']
