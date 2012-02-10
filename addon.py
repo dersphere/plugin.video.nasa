@@ -77,8 +77,7 @@ def show_videos_by_topic(topic_id, page):
     limit = 30
     page = int(page)
     start = (page - 1) * limit
-    videos, video_count = NasaScraper.get_videos(topic_id, start, limit,
-                                                 order_method=None, order=None)
+    videos, count = NasaScraper.get_videos_by_topic_id(topic_id, start, limit)
     items = [{'label': video['title'],
               'thumbnail': video['thumbnail'],
               'info': {'originaltitle': video['title'],
@@ -92,7 +91,7 @@ def show_videos_by_topic(topic_id, page):
               'is_folder': False,
               'is_playable': True,
              } for video in videos]
-    if video_count > page * limit:
+    if count > page * limit:
         next_page = str(page + 1)
         items.insert(0, {'label': '>> %s %s >>' % (plugin.get_string(30001),
                                                    next_page),

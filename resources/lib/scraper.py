@@ -52,8 +52,8 @@ class NasaScraper(object):
             video_topics = VIDEO_TOPICS
         return video_topics
 
-    def get_videos(self, topic_id, start=0, limit=15,
-                   order_method=None, order=None):
+    def get_videos_by_topic_id(self, topic_id, start=0, limit=15,
+                               order_method=None, order=None):
         if order_method is None or order_method not in ('DESC', 'ASC'):
             order_method = 'DESC'
         if order is None:
@@ -77,6 +77,31 @@ class NasaScraper(object):
             params['external_genre_ids'] = topic_id
         else:
             params['genre_ids'] = topic_id
+        return self.__get_videos(params)
+
+    def search_videos(self, fields, query, start=0, limit=15):
+        if order_method is None or order_method not in ('DESC', 'ASC'):
+            order_method = 'DESC'
+        if order is None:
+            order = 'date_published_start'
+        if start < 0:
+            start = 0
+        if limit < 0 or limit > 250:
+            limit = 15
+        params = {'action': 'searchMedia',
+                  'class_id': 1,
+                  'alltime': 1,
+                  'get_count': 1,
+                  'export': 'JSONP',
+                  'start': start,
+                  'limit': limit,
+                  'metadata': 1,
+                  'atoken': self.atoken,
+                  'fields': ','.join(fields),
+                  'query': query}
+        return self.__get_videos(params)
+
+    def __get_videos(self, params):
         url = API_URL
         html = self.__get_url(url, get_dict=params)
         json_data = self.__get_json(html)
