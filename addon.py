@@ -7,7 +7,8 @@ __id__ = 'plugin.video.nasa'
 
 class Plugin_mod(Plugin):
 
-    def add_items(self, iterable, view_mode=None, sort_method_ids=[]):
+    def add_items(self, iterable, view_mode=None,
+                  sort_method_ids=[], is_update=False,):
         items = []
         urls = []
         for i, li_info in enumerate(iterable):
@@ -22,7 +23,7 @@ class Plugin_mod(Plugin):
             xbmcplugin.addDirectoryItems(self.handle, items, len(items))
             for id in sort_method_ids:
                 xbmcplugin.addSortMethod(self.handle, id)
-            xbmcplugin.endOfDirectory(self.handle)
+            xbmcplugin.endOfDirectory(self.handle, updateListing=is_update)
         return urls
 
 plugin = Plugin_mod(__addon_name__, __id__, __file__)
@@ -62,17 +63,21 @@ def show_topics():
     topics = NasaScraper.get_video_topics()
     items = [{'label': topic['name'],
               'url': plugin.url_for('show_videos_by_topic',
-                                    topic_id=topic['id']),
+                                    topic_id=topic['id'],
+                                    page='1'),
              } for topic in topics]
     __log('show_topics finished')
     return plugin.add_items(items)
 
 
-@plugin.route('/videos/<topic_id>/')
-def show_videos_by_topic(topic_id):
+@plugin.route('/videos/<topic_id>/<page>/')
+def show_videos_by_topic(topic_id, page):
     __log('show_videos_by_topic started with topic_id=%s' % topic_id)
     NasaScraper = scraper.NasaScraper()
-    videos, video_count = NasaScraper.get_videos(topic_id, start=0, limit=15,
+    limit = 30
+    page = int(page)
+    start = (page - 1) * limit
+    videos, video_count = NasaScraper.get_videos(topic_id, start, limit,
                                                  order_method=None, order=None)
     items = [{'label': video['title'],
               'thumbnail': video['thumbnail'],
@@ -87,8 +92,24 @@ def show_videos_by_topic(topic_id):
               'is_folder': False,
               'is_playable': True,
              } for video in videos]
+    if video_count > page * limit:
+        next_page = str(page + 1)
+        items.insert(0, {'label': '>> %s %s >>' % (plugin.get_string(30001),
+                                                   next_page),
+                         'url': plugin.url_for('show_videos_by_topic',
+                                               topic_id=topic_id,
+                                               page=next_page)})
+    if page > 1:
+        previous_page = str(page - 1)
+        items.insert(0, {'label': '<< %s %s <<' % (plugin.get_string(30001),
+                                                   previous_page),
+                         'url': plugin.url_for('show_videos_by_topic',
+                                               topic_id=topic_id,
+                                               page=previous_page)})
+    is_update = (page != 1)
     __log('show_videos_by_topic finished')
-    return plugin.add_items(items, sort_method_ids=(37, 3, 4, 8))
+    return plugin.add_items(items, sort_method_ids=(37, 3, 4, 8),
+                            is_update=is_update)
 
 
 @plugin.route('/video/<id>/')
