@@ -1,4 +1,5 @@
 import simplejson as json
+import datetime
 from urllib import urlencode
 from urllib2 import urlopen, Request
 import re
@@ -79,14 +80,12 @@ class NasaScraper(object):
         url = API_URL
         html = self.__get_url(url, get_dict=params)
         json_data = self.__get_json(html)
-        media = json_data['media']
-        videos = []
-        for m in media:
-            videos.append({'title': m['title'],
-                           'duration': m['duration'],
-                           'thumbnail': m['thumbnail'][0]['url'],
-                           'description': m['description'],
-                           'id': m['id']})
+        videos = [{'title': v['title'],
+                   'duration': self.__format_duration(v['duration']),
+                   'thumbnail': v['thumbnail'][0]['url'],
+                   'description': v['description'],
+                   'id': v['id'],
+                  } for v in json_data['media']]
         total_count = json_data['total_count']
         return videos, total_count
 
@@ -167,6 +166,9 @@ class NasaScraper(object):
         json_obj = json.loads(html)
         log('__get_json finished')
         return json_obj
+
+    def __format_duration(self, seconds):
+        return str(datetime.timedelta(seconds=int(seconds)))
 
 
 def log(text):

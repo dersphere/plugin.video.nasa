@@ -78,7 +78,7 @@ def show_videos_by_topic(topic_id):
               'thumbnail': video['thumbnail'],
               'info': {'originaltitle': video['title'],
                        'duration': video['duration'],
-                       'description': video['description']},
+                       'plot': video['description']},
               'url': plugin.url_for('play', id=video['id']),
               'is_folder': False,
               'is_playable': True,
