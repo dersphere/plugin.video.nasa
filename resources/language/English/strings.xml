@@ -5,7 +5,8 @@
 
     <!-- Root menu entries -->
     <string id="30100">Nasa TV (live)</string>
-    <string id="30101">Recent Videos</string>
+    <string id="30101">Browse Videos</string>
+    <string id="30102">Search Videos</string>
 
     <!-- Search -->
     <string id="30200">Search for Video</string>

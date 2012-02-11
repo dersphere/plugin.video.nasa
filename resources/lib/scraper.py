@@ -79,18 +79,15 @@ class NasaScraper(object):
             params['genre_ids'] = topic_id
         return self.__get_videos(params)
 
-    def search_videos(self, fields, query, start=0, limit=15):
-        if order_method is None or order_method not in ('DESC', 'ASC'):
-            order_method = 'DESC'
-        if order is None:
-            order = 'date_published_start'
+    def search_videos(self, query, fields=None, start=0, limit=15):
         if start < 0:
             start = 0
         if limit < 0 or limit > 250:
             limit = 15
+        if fields is None:
+            fields = ['title', ]
         params = {'action': 'searchMedia',
                   'class_id': 1,
-                  'alltime': 1,
                   'get_count': 1,
                   'export': 'JSONP',
                   'start': start,
@@ -105,16 +102,28 @@ class NasaScraper(object):
         url = API_URL
         html = self.__get_url(url, get_dict=params)
         json_data = self.__get_json(html)
-        videos = [{'title': v['title'],
-                   'duration': self.__format_duration(v['duration']),
-                   'thumbnail': v['thumbnail'][0]['url'],
-                   'description': v['description'],
-                   'date': self.__format_date(v['date_published_start']),
-                   'filesize': int(v['formats']['format'][-1]['filesize']),
-                   'author': v['author'],
-                   'genres': [g['name'] for g in v['genres']],
-                   'id': v['id'],
-                  } for v in json_data['media']]
+        if 'media' in json_data:
+            items = json_data['media']
+        elif 'medias' in json_data:
+            items = json_data['medias']['media']
+        else:
+            items = []
+        videos = []
+        for item in items:
+            if 'genres' in item:
+                genres = [g['name'] for g in item['genres']]
+            else:
+                genres = []
+            v = {'title': item['title'],
+                 'duration': self.__format_duration(item['duration']),
+                 'thumbnail': item['thumbnail'][0]['url'],
+                 'description': item['description'],
+                 'date': self.__format_date(item['date_published_start']),
+                 'filesize': int(item['formats']['format'][-1]['filesize']),
+                 'author': item['author'],
+                 'genres': genres,
+                 'id': item['id']}
+            videos.append(v)
         total_count = json_data['total_count']
         return videos, total_count
 
@@ -169,10 +178,10 @@ class NasaScraper(object):
     def __get_url(self, url, get_dict='', post_dict=''):
         log('__get_url started with url=%s, get_dict=%s, post_dict=%s'
             % (url, get_dict, post_dict))
-        hash = '%s-%s-%s' % (url, urlencode(get_dict), urlencode(post_dict))
-        if hash in self.requests.keys():
+        uid = '%s-%s-%s' % (url, urlencode(get_dict), urlencode(post_dict))
+        if uid in self.requests.keys():
             log('__get_url using cache for url=%s' % url)
-            response = self.requests[hash]
+            response = self.requests[uid]
         else:
             if get_dict:
                 full_url = '%s?%s' % (url, urlencode(get_dict))
@@ -186,7 +195,7 @@ class NasaScraper(object):
                 response = urlopen(req, urlencode(post_dict)).read()
             else:
                 response = urlopen(req).read()
-            self.requests[hash] = response
+            self.requests[uid] = response
             log('__get_url finished with %d bytes result' % len(response))
         return response
 

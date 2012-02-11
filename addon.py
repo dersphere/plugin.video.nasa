@@ -37,7 +37,8 @@ def show_root_menu():
                   'url': plugin.url_for('show_streams')})
     items.append({'label': plugin.get_string(30101),
                   'url': plugin.url_for('show_topics')})
-
+    items.append({'label': plugin.get_string(30102),
+                  'url': plugin.url_for('search')})
     __log('show_root_menu end')
     return plugin.add_items(items)
 
@@ -78,19 +79,7 @@ def show_videos_by_topic(topic_id, page):
     page = int(page)
     start = (page - 1) * limit
     videos, count = NasaScraper.get_videos_by_topic_id(topic_id, start, limit)
-    items = [{'label': video['title'],
-              'thumbnail': video['thumbnail'],
-              'info': {'originaltitle': video['title'],
-                       'duration': video['duration'],
-                       'plot': video['description'],
-                       'date': video['date'],
-                       'size': video['filesize'],
-                       'credits': video['author'],
-                       'genre': '|'.join(video['genres'])},
-              'url': plugin.url_for('play', id=video['id']),
-              'is_folder': False,
-              'is_playable': True,
-             } for video in videos]
+    items = __format_videos(videos)
     if count > page * limit:
         next_page = str(page + 1)
         items.insert(0, {'label': '>> %s %s >>' % (plugin.get_string(30001),
@@ -120,21 +109,36 @@ def play(id):
     return plugin.set_resolved_url(video['url'])
 
 
-@plugin.route('/search_station/')
+@plugin.route('/search/')
 def search():
     __log('search start')
-    search_string = None
+    query = None
     keyboard = xbmc.Keyboard('', plugin.get_string(30201))
     keyboard.doModal()
     if keyboard.isConfirmed() and keyboard.getText():
-        search_string = keyboard.getText()
-        __log('search gots a string: "%s"' % search_string)
-        language = __get_language()
-        stations = NasaScraper.search_stations_by_string(language,
-                                                         search_string)
-        items = __format_stations(stations)
+        query = keyboard.getText()
+        __log('search gots a string: "%s"' % query)
+        NasaScraper = scraper.NasaScraper()
+        videos, count = NasaScraper.search_videos(query)
+        items = __format_videos(videos)
         __log('search end')
         return plugin.add_items(items)
+
+
+def __format_videos(videos):
+    return [{'label': video['title'],
+             'thumbnail': video['thumbnail'],
+             'info': {'originaltitle': video['title'],
+                      'duration': video['duration'],
+                      'plot': video['description'],
+                      'date': video['date'],
+                      'size': video['filesize'],
+                      'credits': video['author'],
+                      'genre': '|'.join(video['genres'])},
+             'url': plugin.url_for('play', id=video['id']),
+             'is_folder': False,
+             'is_playable': True,
+            } for video in videos]
 
 
 def __log(text):
