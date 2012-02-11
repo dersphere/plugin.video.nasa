@@ -1,5 +1,6 @@
 from xbmcswift import Plugin, xbmc, xbmcplugin, xbmcgui, clean_dict
-import resources.lib.scraper as scraper
+import resources.lib.videos_scraper as videos_scraper
+import resources.lib.streams_scraper as streams_scraper
 
 __addon_name__ = 'Nasa'
 __id__ = 'plugin.video.nasa'
@@ -46,13 +47,19 @@ def show_root_menu():
 @plugin.route('/streams/')
 def show_streams():
     __log('show_streams start')
-    NasaScraper = scraper.NasaScraper()
-    streams = NasaScraper.get_streams()
+    streams = streams_scraper.get_streams()
     items = [{'label': stream['title'],
-              'url': stream['url'],
+              'url': plugin.url_for('stream', id=stream['id']),
+              'thumbnail': stream['thumbnail'],
               'is_folder': False,
               'is_playable': True,
              } for stream in streams]
+    items.extend([{'label': stream['title'],
+                   'url': stream['url'],
+                   'thumbnail': stream['thumbnail'],
+                   'is_folder': False,
+                   'is_playable': True,
+                  } for stream in streams_scraper.STATIC_CHANNELS])
     __log('show_streams finished')
     return plugin.add_items(items)
 
@@ -60,8 +67,8 @@ def show_streams():
 @plugin.route('/videos/')
 def show_topics():
     __log('show_topics started')
-    NasaScraper = scraper.NasaScraper()
-    topics = NasaScraper.get_video_topics()
+    Scraper = videos_scraper.Scraper()
+    topics = Scraper.get_video_topics()
     items = [{'label': topic['name'],
               'url': plugin.url_for('show_videos_by_topic',
                                     topic_id=topic['id'],
@@ -74,11 +81,11 @@ def show_topics():
 @plugin.route('/videos/<topic_id>/<page>/')
 def show_videos_by_topic(topic_id, page):
     __log('show_videos_by_topic started with topic_id=%s' % topic_id)
-    NasaScraper = scraper.NasaScraper()
+    Scraper = videos_scraper.Scraper()
     limit = 30
     page = int(page)
     start = (page - 1) * limit
-    videos, count = NasaScraper.get_videos_by_topic_id(topic_id, start, limit)
+    videos, count = Scraper.get_videos_by_topic_id(topic_id, start, limit)
     items = __format_videos(videos)
     if count > page * limit:
         next_page = str(page + 1)
@@ -103,10 +110,18 @@ def show_videos_by_topic(topic_id, page):
 @plugin.route('/video/<id>/')
 def play(id):
     __log('play started with id=%s' % id)
-    NasaScraper = scraper.NasaScraper()
-    video = NasaScraper.get_video(id)
+    Scraper = videos_scraper.Scraper()
+    video = Scraper.get_video(id)
     __log('play finished with video=%s' % video)
     return plugin.set_resolved_url(video['url'])
+
+
+@plugin.route('/stream/<id>/')
+def stream(id):
+    __log('stream started with id=%s' % id)
+    stream_url = streams_scraper.get_stream(id)
+    __log('stream finished with video=%s' % stream_url)
+    return plugin.set_resolved_url(stream_url)
 
 
 @plugin.route('/search/')
@@ -118,8 +133,8 @@ def search():
     if keyboard.isConfirmed() and keyboard.getText():
         query = keyboard.getText()
         __log('search gots a string: "%s"' % query)
-        NasaScraper = scraper.NasaScraper()
-        videos, count = NasaScraper.search_videos(query)
+        Scraper = videos_scraper.Scraper()
+        videos, count = Scraper.search_videos(query)
         items = __format_videos(videos)
         __log('search end')
         return plugin.add_items(items)

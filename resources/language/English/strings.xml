@@ -4,11 +4,11 @@
     <string id="30001">Page</string>
 
     <!-- Root menu entries -->
-    <string id="30100">Nasa TV (live)</string>
-    <string id="30101">Browse Videos</string>
-    <string id="30102">Search Videos</string>
+    <string id="30100">Livestreams</string>
+    <string id="30101">Videos</string>
+    <string id="30102">Search</string>
 
     <!-- Search -->
     <string id="30200">Search for Video</string>
-    <string id="30201">Enter title or topic</string>
+    <string id="30201">Title</string>
 </strings>

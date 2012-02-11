@@ -29,7 +29,7 @@ VIDEO_TOPICS = ({'id': '131', 'name': 'All Videos'},
 ATOKEN = 'cf15596810c05b64c422e071473549f4'
 
 
-class NasaScraper(object):
+class Scraper(object):
 
     def __init__(self, force_refresh=False):
         self.force_refresh = force_refresh
@@ -127,17 +127,6 @@ class NasaScraper(object):
         total_count = json_data['total_count']
         return videos, total_count
 
-    def get_streams(self):
-        streams = []
-        streams.append({'title': 'Nasa TV',
-                        'url': ('rtmp://cp76072.live.edgefcs.net/live/ '
-                                'swfUrl="http://www.nasa.gov/templateimages/'
-                                'redesign/flash_player/swf/4.5/player.swf" '
-                                'pageUrl="http://www.nasa.gov/multimedia/'
-                                'nasatv/media_flash.html" '
-                                'Playpath=MED-HQ-Flash@42814 live=true')})
-        return streams
-
     def get_video(self, id):
         params = {'action': 'getMedia',
                   'media_id': id,
@@ -218,4 +207,4 @@ class NasaScraper(object):
 
 
 def log(text):
-    print 'Nasa scraper: %s' % text
+    print 'Nasa videos scraper: %s' % text
