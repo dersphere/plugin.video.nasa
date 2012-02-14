@@ -1,0 +1,50 @@
+from urllib2 import urlopen
+from BeautifulSoup import BeautifulStoneSoup, BeautifulSoup
+import re
+
+MAIN_URL = 'http://www.nasa.gov/rss/'
+
+
+def get_vodcasts():
+    url = 'http://www.nasa.gov/multimedia/index.html'
+    html = urlopen(url).read()
+    e = BeautifulStoneSoup.HTML_ENTITIES
+    tree = BeautifulSoup(html, convertEntities=e)
+    sections = tree.findAll('div', {'class': 'box_230_cap'})
+    vodcasts = []
+    for section in sections:
+        if section.find('h2', text='Video Podcasts'):
+            for row in section.findAll('tr'):
+                cells = row.findAll('td')
+                if len(cells) == 2:
+                    title = cells[0].b.string
+                    link = cells[1].a['href']
+                    if '/rss/' in link:
+                        vodcasts.append({'title': title[1:],
+                                         'rss_file': link[5:]})
+            break
+    return vodcasts
+
+
+def show_vodcast_videos(rss_file):
+    url = MAIN_URL + rss_file
+    rss = urlopen(url).read()
+    e = BeautifulStoneSoup.XML_ENTITIES
+    tree = BeautifulStoneSoup(rss, convertEntities=e)
+    items = tree.findAll('item')
+    videos = []
+    for item in items:
+        if item.find(re.compile('^media')):
+            thumbnail = item.find(re.compile('^media'))['url']
+        else:
+            thumbnail = 'DefaultVideo.png'
+        videos.append({'title': item.title.string,
+                       'thumbnail': thumbnail,
+                       'url': item.enclosure['url'],
+                       'size': item.enclosure['length'],
+                       'description': item.description.string})
+    return videos
+
+
+def log(text):
+    print 'Nasa vodcasts scraper: %s' % text

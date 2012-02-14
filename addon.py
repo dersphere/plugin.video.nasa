@@ -1,6 +1,7 @@
 from xbmcswift import Plugin, xbmc, xbmcplugin, xbmcgui, clean_dict
 import resources.lib.videos_scraper as videos_scraper
 import resources.lib.streams_scraper as streams_scraper
+import resources.lib.vodcast_scraper as vodcast_scraper
 
 __addon_name__ = 'Nasa'
 __id__ = 'plugin.video.nasa'
@@ -40,6 +41,8 @@ def show_root_menu():
                   'url': plugin.url_for('show_topics')})
     items.append({'label': plugin.get_string(30102),
                   'url': plugin.url_for('search')})
+    items.append({'label': plugin.get_string(30103),
+                  'url': plugin.url_for('show_vodcasts')})
     __log('show_root_menu end')
     return plugin.add_items(items)
 
@@ -71,6 +74,33 @@ def show_topics():
                                     page='1'),
              } for topic in topics]
     __log('show_topics finished')
+    return plugin.add_items(items)
+
+
+@plugin.route('/vodcasts/')
+def show_vodcasts():
+    __log('show_vodcasts start')
+    vodcasts = vodcast_scraper.get_vodcasts()
+    items = [{'label': vodcast['title'],
+              'url': plugin.url_for('show_vodcast_videos',
+                                    rss_file=vodcast['rss_file']),
+             } for vodcast in vodcasts]
+    __log('show_vodcasts finished')
+    return plugin.add_items(items)
+
+
+@plugin.route('/vodcast/<rss_file>/')
+def show_vodcast_videos(rss_file):
+    __log('show_vodcast_videos start')
+    videos = vodcast_scraper.show_vodcast_videos(rss_file)
+    items = [{'label': video['title'],
+              'info': {'plot': video['description']},
+              'url': video['url'],
+              'thumbnail': video['thumbnail'],
+              'is_folder': False,
+              'is_playable': True,
+             } for video in videos]
+    __log('show_vodcast_videos finished')
     return plugin.add_items(items)
 
 
