@@ -51,15 +51,11 @@ def show_streams():
     items = [{'label': stream['title'],
               'url': plugin.url_for('stream', id=stream['id']),
               'thumbnail': stream['thumbnail'],
+               'info': {'originaltitle': stream['title'],
+                        'plot': stream['description']},
               'is_folder': False,
               'is_playable': True,
              } for stream in streams]
-    items.extend([{'label': stream['title'],
-                   'url': stream['url'],
-                   'thumbnail': stream['thumbnail'],
-                   'is_folder': False,
-                   'is_playable': True,
-                  } for stream in streams_scraper.STATIC_CHANNELS])
     __log('show_streams finished')
     return plugin.add_items(items)
 
