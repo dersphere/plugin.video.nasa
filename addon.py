@@ -71,7 +71,7 @@ def show_video_topics():
                                     topic_id=topic['id'],
                                     page='1'),
              } for topic in topics]
-    items.append({'label': plugin.get_string(30102),
+    items.append({'label': plugin.get_string(30200),
                   'url': plugin.url_for('search')})
     __log('show_video_topics finished')
     return plugin.add_items(items)
