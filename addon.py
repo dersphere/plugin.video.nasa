@@ -98,7 +98,7 @@ def show_vodcast_videos(rss_file):
               'url': video['url'],
               'thumbnail': video['thumbnail'],
               'is_folder': False,
-              'is_play_videoable': True,
+              'is_playable': True,
              } for video in videos]
     __log('show_vodcast_videos finished')
     return plugin.add_items(items)
@@ -178,7 +178,7 @@ def __format_videos(videos):
                       'genre': '|'.join(video['genres'])},
              'url': plugin.url_for('play_video', id=video['id']),
              'is_folder': False,
-             'is_play_videoable': True,
+             'is_playable': True,
             } for video in videos]
 
 
