@@ -38,7 +38,7 @@ def show_root_menu():
     items.append({'label': plugin.get_string(30100),
                   'url': plugin.url_for('show_streams')})
     items.append({'label': plugin.get_string(30101),
-                  'url': plugin.url_for('show_topics')})
+                  'url': plugin.url_for('show_video_topics')})
     items.append({'label': plugin.get_string(30102),
                   'url': plugin.url_for('search')})
     items.append({'label': plugin.get_string(30103),
@@ -52,7 +52,7 @@ def show_streams():
     __log('show_streams start')
     streams = streams_scraper.get_streams()
     items = [{'label': stream['title'],
-              'url': plugin.url_for('stream', id=stream['id']),
+              'url': plugin.url_for('play_stream', id=stream['id']),
               'thumbnail': stream['thumbnail'],
                'info': {'originaltitle': stream['title'],
                         'plot': stream['description']},
@@ -64,8 +64,8 @@ def show_streams():
 
 
 @plugin.route('/videos/')
-def show_topics():
-    __log('show_topics started')
+def show_video_topics():
+    __log('show_video_topics started')
     Scraper = videos_scraper.Scraper()
     topics = Scraper.get_video_topics()
     items = [{'label': topic['name'],
@@ -73,7 +73,7 @@ def show_topics():
                                     topic_id=topic['id'],
                                     page='1'),
              } for topic in topics]
-    __log('show_topics finished')
+    __log('show_video_topics finished')
     return plugin.add_items(items)
 
 
@@ -98,7 +98,7 @@ def show_vodcast_videos(rss_file):
               'url': video['url'],
               'thumbnail': video['thumbnail'],
               'is_folder': False,
-              'is_playable': True,
+              'is_play_videoable': True,
              } for video in videos]
     __log('show_vodcast_videos finished')
     return plugin.add_items(items)
@@ -134,19 +134,19 @@ def show_videos_by_topic(topic_id, page):
 
 
 @plugin.route('/video/<id>/')
-def play(id):
-    __log('play started with id=%s' % id)
+def play_video(id):
+    __log('play_video started with id=%s' % id)
     Scraper = videos_scraper.Scraper()
     video = Scraper.get_video(id)
-    __log('play finished with video=%s' % video)
+    __log('play_video finished with video=%s' % video)
     return plugin.set_resolved_url(video['url'])
 
 
 @plugin.route('/stream/<id>/')
-def stream(id):
-    __log('stream started with id=%s' % id)
+def play_stream(id):
+    __log('play_stream started with id=%s' % id)
     stream_url = streams_scraper.get_stream(id)
-    __log('stream finished with video=%s' % stream_url)
+    __log('play_stream finished with video=%s' % stream_url)
     return plugin.set_resolved_url(stream_url)
 
 
@@ -176,9 +176,9 @@ def __format_videos(videos):
                       'size': video['filesize'],
                       'credits': video['author'],
                       'genre': '|'.join(video['genres'])},
-             'url': plugin.url_for('play', id=video['id']),
+             'url': plugin.url_for('play_video', id=video['id']),
              'is_folder': False,
-             'is_playable': True,
+             'is_play_videoable': True,
             } for video in videos]
 
 
