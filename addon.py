@@ -39,8 +39,6 @@ def show_root_menu():
                   'url': plugin.url_for('show_streams')})
     items.append({'label': plugin.get_string(30101),
                   'url': plugin.url_for('show_video_topics')})
-    items.append({'label': plugin.get_string(30102),
-                  'url': plugin.url_for('search')})
     items.append({'label': plugin.get_string(30103),
                   'url': plugin.url_for('show_vodcasts')})
     __log('show_root_menu end')
@@ -73,6 +71,8 @@ def show_video_topics():
                                     topic_id=topic['id'],
                                     page='1'),
              } for topic in topics]
+    items.append({'label': plugin.get_string(30102),
+                  'url': plugin.url_for('search')})
     __log('show_video_topics finished')
     return plugin.add_items(items)
 
