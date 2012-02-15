@@ -6,13 +6,13 @@ MAIN_URL = 'http://www.nasa.gov/rss/'
 
 
 def get_vodcasts():
+    log('get_vodcasts started')
     url = 'http://www.nasa.gov/multimedia/index.html'
     html = urlopen(url).read()
     e = BeautifulStoneSoup.HTML_ENTITIES
     tree = BeautifulSoup(html, convertEntities=e)
-    sections = tree.findAll('div', {'class': 'box_230_cap'})
     vodcasts = []
-    for section in sections:
+    for section in tree.findAll('div', {'class': 'box_230_cap'}):
         if section.find('h2', text='Video Podcasts'):
             for row in section.findAll('tr'):
                 cells = row.findAll('td')
@@ -23,10 +23,12 @@ def get_vodcasts():
                         vodcasts.append({'title': title[1:],
                                          'rss_file': link[5:]})
             break
+    log('get_vodcasts finished with %d vodcasts' % len(vodcasts))
     return vodcasts
 
 
 def show_vodcast_videos(rss_file):
+    log('get_vodcasts started with rss_file=%s' % rss_file)
     r_media = re.compile('^media')
     url = MAIN_URL + rss_file
     rss = urlopen(url).read()
@@ -42,6 +44,7 @@ def show_vodcast_videos(rss_file):
                        'thumbnail': thumbnail,
                        'url': item.enclosure['url'],
                        'description': item.description.string})
+    log('show_vodcast_videos finished with %d videos' % len(videos))
     return videos
 
 

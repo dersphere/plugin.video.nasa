@@ -1,4 +1,4 @@
-import simplejson as json
+import simplejson
 import datetime
 from urllib import urlencode
 from urllib2 import urlopen, Request
@@ -14,20 +14,6 @@ API_URL = 'http://cdn-api.vmixcore.com/apis/media.php'
 VIDEO_LANDING_URL = ('http://www.nasa.gov/multimedia/'
                      'videogallery/vmixVideoLanding2.js')
 
-VIDEO_TOPICS = ({'id': '131', 'name': 'All Videos'},
-                {'id': '7844', 'name': 'Aeronautics'},
-                {'id': '13851', 'name': 'Beyond Earth'},
-                {'id': '13861', 'name': 'Commercial Space'},
-                {'id': '7845', 'name': 'Earth'},
-                {'id': '13841', 'name': 'NASA History and People'},
-                {'id': '7914', 'name': 'NASA In Your Life'},
-                {'id': '7774', 'name': 'Station and Shuttle'},
-                {'id': '7773', 'name': 'Solar System'},
-                {'id': '7849', 'name': 'Technology'},
-                {'id': '7850', 'name': 'Universe'})
-
-ATOKEN = 'cf15596810c05b64c422e071473549f4'
-
 
 class Scraper(object):
 
@@ -37,21 +23,17 @@ class Scraper(object):
         self.atoken = self.__get_atoken()
 
     def get_video_topics(self):
-        if self.force_refresh:
-            log('get_video_topics started with force_refresh')
-            url = VIDEO_LANDING_URL
-            r_genre_names = re.compile('var genreNames=\[(.+?)\];')
-            r_genre_ids = re.compile('var genreIds=\[(.+?)\];')
-            html = self.__get_url(url)
-            genre_names = re.search(r_genre_names, html).group(1).split(',')
-            genre_ids = re.search(r_genre_ids, html).group(1).split(',')
-            video_topics = []
-            for genre_id, genre_name in zip(genre_ids, genre_names):
-                video_topics.append({'id': genre_id,
-                                     'name': genre_name.strip("'")})
-        else:
-            log('get_video_topics started')
-            video_topics = VIDEO_TOPICS
+        log('get_video_topics started')
+        url = VIDEO_LANDING_URL
+        r_genre_names = re.compile('var genreNames=\[(.+?)\];')
+        r_genre_ids = re.compile('var genreIds=\[(.+?)\];')
+        html = self.__get_url(url)
+        genre_names = re.search(r_genre_names, html).group(1).split(',')
+        genre_ids = re.search(r_genre_ids, html).group(1).split(',')
+        video_topics = []
+        for genre_id, genre_name in zip(genre_ids, genre_names):
+            video_topics.append({'id': genre_id,
+                                 'name': genre_name.strip("'")})
         log('get_video_topics got %d topics' % len(video_topics))
         return video_topics
 
@@ -110,8 +92,8 @@ class Scraper(object):
     def __get_videos(self, params):
         url = API_URL
         html = self.__get_url(url, get_dict=params)
-        json_data = self.__get_json(html)
-        items = json_data.get('media') or json_data['medias'].get('media')
+        json = self.__get_json(html)
+        items = json.get('media') or json.get('medias', {}).get('media', [])
         videos = [{'title': item['title'],
                    'duration': self.__format_duration(item['duration']),
                    'thumbnail': item['thumbnail'][0]['url'],
@@ -122,7 +104,7 @@ class Scraper(object):
                    'genres': [g['name'] for g in item.get('genres', [])],
                    'id': item['id'],
                   } for item in items]
-        total_count = json_data['total_count']
+        total_count = json['total_count']
         return videos, total_count
 
     def get_video(self, id):
@@ -132,11 +114,10 @@ class Scraper(object):
                   'atoken': self.atoken}
         url = API_URL
         html = self.__get_url(url, get_dict=params)
-        json_data = self.__get_json(html)
-        media = json_data
+        media = self.__get_json(html)
         token = media['formats']['format'][-1]['token']
         signature = self.__get_nasa_signature(token)
-        timestamp = '1325444582134'
+        timestamp = self.__get_timestamp()
         p = 'token=%s&expires=%s&signature=%s' % (token, timestamp, signature)
         download_url = 'http://media.vmixcore.com/vmixcore/download?%s' % p
         video = {'title': media['title'],
@@ -161,8 +142,19 @@ class Scraper(object):
             atoken = re.search(r_atoken, html).group(1)
             log('retrieved atoken: %s' % atoken)
         else:
-            atoken = ATOKEN
+            atoken = 'cf15596810c05b64c422e071473549f4'
         return atoken
+
+    def __get_timestamp(self):
+        if self.force_refresh:
+            url = VIDEO_LANDING_URL
+            r_timestamp = re.compile('var timestamp = \'(.+?)\';')
+            html = self.__get_url(url)
+            timestamp = re.search(r_timestamp, html).group(1)
+            log('retrieved timestamp: %s' % timestamp)
+        else:
+            timestamp = '1325444582134'
+        return timestamp
 
     def __get_url(self, url, get_dict='', post_dict=''):
         log('__get_url started with url=%s, get_dict=%s, post_dict=%s'
@@ -189,7 +181,7 @@ class Scraper(object):
         return response
 
     def __get_json(self, html):
-        json_obj = json.loads(html)
+        json_obj = simplejson.loads(html)
         return json_obj
 
     def __format_duration(self, seconds_str):
