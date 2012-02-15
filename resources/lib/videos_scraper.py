@@ -108,22 +108,16 @@ class Scraper(object):
             items = json_data['medias']['media']
         else:
             items = []
-        videos = []
-        for item in items:
-            if 'genres' in item:
-                genres = [g['name'] for g in item['genres']]
-            else:
-                genres = []
-            v = {'title': item['title'],
-                 'duration': self.__format_duration(item['duration']),
-                 'thumbnail': item['thumbnail'][0]['url'],
-                 'description': item['description'],
-                 'date': self.__format_date(item['date_published_start']),
-                 'filesize': int(item['formats']['format'][-1]['filesize']),
-                 'author': item['author'],
-                 'genres': genres,
-                 'id': item['id']}
-            videos.append(v)
+        videos = [{'title': item['title'],
+                   'duration': self.__format_duration(item['duration']),
+                   'thumbnail': item['thumbnail'][0]['url'],
+                   'description': item['description'],
+                   'date': self.__format_date(item['date_published_start']),
+                   'filesize': int(item['formats']['format'][-1]['filesize']),
+                   'author': item['author'],
+                   'genres': [g['name'] for g in item.get('genres', [])],
+                   'id': item['id'],
+                  } for item in items]
         total_count = json_data['total_count']
         return videos, total_count
 

@@ -1,7 +1,7 @@
 from xbmcswift import Plugin, xbmc, xbmcplugin, xbmcgui, clean_dict
 import resources.lib.videos_scraper as videos_scraper
 import resources.lib.streams_scraper as streams_scraper
-import resources.lib.vodcast_scraper as vodcast_scraper
+import resources.lib.vodcasts_scraper as vodcast_scraper
 
 __addon_name__ = 'Nasa'
 __id__ = 'plugin.video.nasa'
