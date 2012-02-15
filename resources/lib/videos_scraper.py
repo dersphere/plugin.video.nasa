@@ -45,9 +45,9 @@ class Scraper(object):
             genre_names = re.search(r_genre_names, html).group(1).split(',')
             genre_ids = re.search(r_genre_ids, html).group(1).split(',')
             video_topics = []
-            for genre in zip(genre_ids, genre_names):
-                video_topics.append({'id': genre[0],
-                                     'name': genre[1].strip("'")})
+            for genre_id, genre_name in zip(genre_ids, genre_names):
+                video_topics.append({'id': genre_id,
+                                     'name': genre_name.strip("'")})
         else:
             video_topics = VIDEO_TOPICS
         return video_topics
@@ -102,12 +102,7 @@ class Scraper(object):
         url = API_URL
         html = self.__get_url(url, get_dict=params)
         json_data = self.__get_json(html)
-        if 'media' in json_data:
-            items = json_data['media']
-        elif 'medias' in json_data:
-            items = json_data['medias']['media']
-        else:
-            items = []
+        items = json_data.get('media') or json_data['medias'].get('media')
         videos = [{'title': item['title'],
                    'duration': self.__format_duration(item['duration']),
                    'thumbnail': item['thumbnail'][0]['url'],
@@ -153,7 +148,7 @@ class Scraper(object):
             r_atoken = re.compile('var atoken = \'(.+?)\';')
             html = self.__get_url(url)
             atoken = re.search(r_atoken, html).group(1)
-            log('retrieved atoken: %s' % self.atoken)
+            log('retrieved atoken: %s' % atoken)
         else:
             atoken = ATOKEN
         return atoken

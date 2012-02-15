@@ -27,15 +27,15 @@ def get_vodcasts():
 
 
 def show_vodcast_videos(rss_file):
+    r_media = re.compile('^media')
     url = MAIN_URL + rss_file
     rss = urlopen(url).read()
     e = BeautifulStoneSoup.XML_ENTITIES
     tree = BeautifulStoneSoup(rss, convertEntities=e)
-    items = tree.findAll('item')
     videos = []
-    for item in items:
-        if item.find(re.compile('^media')):
-            thumbnail = item.find(re.compile('^media'))['url']
+    for item in tree.findAll('item'):
+        if item.find(r_media):
+            thumbnail = item.find(r_media)['url']
         else:
             thumbnail = 'DefaultVideo.png'
         videos.append({'title': item.title.string,
