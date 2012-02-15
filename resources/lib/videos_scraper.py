@@ -38,6 +38,7 @@ class Scraper(object):
 
     def get_video_topics(self):
         if self.force_refresh:
+            log('get_video_topics started with force_refresh')
             url = VIDEO_LANDING_URL
             r_genre_names = re.compile('var genreNames=\[(.+?)\];')
             r_genre_ids = re.compile('var genreIds=\[(.+?)\];')
@@ -49,11 +50,14 @@ class Scraper(object):
                 video_topics.append({'id': genre_id,
                                      'name': genre_name.strip("'")})
         else:
+            log('get_video_topics started')
             video_topics = VIDEO_TOPICS
+        log('get_video_topics got %d topics' % len(video_topics))
         return video_topics
 
     def get_videos_by_topic_id(self, topic_id, start=0, limit=15,
                                order_method=None, order=None):
+        log('get_videos_by_topic_id started with topic_id=%s' % topic_id)
         if order_method is None or order_method not in ('DESC', 'ASC'):
             order_method = 'DESC'
         if order is None:
@@ -77,9 +81,12 @@ class Scraper(object):
             params['external_genre_ids'] = topic_id
         else:
             params['genre_ids'] = topic_id
-        return self.__get_videos(params)
+        videos = self.__get_videos(params)
+        log('get_videos_by_topic_id finished with %d videos' % len(videos))
+        return videos
 
     def search_videos(self, query, fields=None, start=0, limit=15):
+        log('search_videos started with query=%s' % query)
         if start < 0:
             start = 0
         if limit < 0 or limit > 250:
@@ -96,7 +103,9 @@ class Scraper(object):
                   'atoken': self.atoken,
                   'fields': ','.join(fields),
                   'query': query}
-        return self.__get_videos(params)
+        videos = self.__get_videos(params)
+        log('search_videos finished with %d videos' % len(videos))
+        return videos
 
     def __get_videos(self, params):
         url = API_URL
@@ -117,6 +126,7 @@ class Scraper(object):
         return videos, total_count
 
     def get_video(self, id):
+        log('get_video started with id=%s' % id)
         params = {'action': 'getMedia',
                   'media_id': id,
                   'atoken': self.atoken}
@@ -132,6 +142,7 @@ class Scraper(object):
         video = {'title': media['title'],
                  'thumbnail': media['thumbnail'][0]['url'],
                  'url': download_url}
+        log('get_video finished')
         return video
 
     def __get_nasa_signature(self, token):
@@ -178,9 +189,7 @@ class Scraper(object):
         return response
 
     def __get_json(self, html):
-        log('__get_json started')
         json_obj = json.loads(html)
-        log('__get_json finished')
         return json_obj
 
     def __format_duration(self, seconds_str):

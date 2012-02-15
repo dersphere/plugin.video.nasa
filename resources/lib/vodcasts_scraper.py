@@ -41,7 +41,6 @@ def show_vodcast_videos(rss_file):
         videos.append({'title': item.title.string,
                        'thumbnail': thumbnail,
                        'url': item.enclosure['url'],
-                       'size': item.enclosure['length'],
                        'description': item.description.string})
     return videos
 
