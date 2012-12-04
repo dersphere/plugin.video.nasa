@@ -50,7 +50,11 @@ def get_stream(id):
 
 
 def __ustream_request(path):
-    url = API_URL + '%s?%s' % ('/'.join(path), urlencode({'key': API_KEY}))
+    params = {
+        'key': API_KEY,
+        'limit': 50
+    }
+    url = API_URL + '%s?%s' % ('/'.join(path), urlencode(params))
     log('__ustream_request opening url=%s' % url)
     response = urlopen(url).read()
     log('__ustream_request finished with %d bytes result' % len(response))
