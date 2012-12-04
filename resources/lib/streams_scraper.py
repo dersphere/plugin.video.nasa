@@ -16,10 +16,12 @@ def get_streams(only_live=True):
         if only_live and channel['status'] != 'live':
             continue
         else:
-            channels.append({'title': channel['title'],
-                             'id': channel['id'],
-                             'description': channel['description'],
-                             'thumbnail': channel['imageUrl']['small']})
+            channels.append({
+                'title': channel['title'],
+                'id': channel['id'],
+                'description': channel['description'],
+                'thumbnail': channel['imageUrl']['small']
+            })
     log('get_streams finished with %d channels' % len(channels))
     return channels
 
@@ -46,8 +48,11 @@ def __generate_rtmp(id):
     if tc_url.count('/') > 1:
         log('__generate_rtmp guessing rtmp without verification')
         app = tc_url.split('/', 1)[1]
-        url = ('rtmp://%s playpath=%s swfUrl=http://www.ustream.tv/flash/viewer.swf pageUrl=%s app=%s live=1'
-               % (tc_url, playpath, page_url, app))
+        swf_url = 'http://www.ustream.tv/flash/viewer.swf'
+        url = (
+            'rtmp://%s playpath=%s swfUrl=%s pageUrl=%s '
+            'app=%s live=1' % (tc_url, playpath, swf_url, page_url, app)
+        )
     else:
         log('__generate_rtmp guessing rtmp with verification')
         swf_url = urlopen('http://www.ustream.tv/flash/viewer.swf').geturl()

@@ -89,7 +89,6 @@ def show_vodcast_videos(rss_file):
         },
         'path': video['url'],
         'thumbnail': video['thumbnail'],
-        'is_folder': False,
         'is_playable': True,
     } for video in videos]
     return plugin.finish(items)

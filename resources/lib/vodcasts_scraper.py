@@ -1,5 +1,5 @@
 from urllib2 import urlopen
-from BeautifulSoup import BeautifulStoneSoup, BeautifulSoup
+from BeautifulSoup import BeautifulStoneSoup
 import re
 
 MAIN_URL = 'http://www.nasa.gov/rss/'
@@ -20,8 +20,10 @@ def get_vodcasts():
                     title = cells[0].b.string
                     link = cells[1].a['href']
                     if '/rss/' in link:
-                        vodcasts.append({'title': title[1:],
-                                         'rss_file': link[5:]})
+                        vodcasts.append({
+                            'title': title[1:],
+                            'rss_file': link[5:]
+                        })
             break
     log('get_vodcasts finished with %d vodcasts' % len(vodcasts))
     return vodcasts
@@ -40,10 +42,12 @@ def show_vodcast_videos(rss_file):
             thumbnail = item.find(r_media)['url']
         else:
             thumbnail = 'DefaultVideo.png'
-        videos.append({'title': item.title.string,
-                       'thumbnail': thumbnail,
-                       'url': item.enclosure['url'],
-                       'description': item.description.string})
+        videos.append({
+            'title': item.title.string,
+            'thumbnail': thumbnail,
+            'url': item.enclosure['url'],
+            'description': item.description.string
+        })
     log('show_vodcast_videos finished with %d videos' % len(videos))
     return videos
 
