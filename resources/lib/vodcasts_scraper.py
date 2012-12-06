@@ -18,7 +18,7 @@
 #
 
 from urllib2 import urlopen
-from BeautifulSoup import BeautifulStoneSoup
+from BeautifulSoup import BeautifulSoup, BeautifulStoneSoup
 import re
 
 MAIN_URL = 'http://www.nasa.gov/rss/'
