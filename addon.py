@@ -23,8 +23,6 @@ import resources.lib.videos_scraper as videos_scraper
 import resources.lib.streams_scraper as streams_scraper
 import resources.lib.vodcasts_scraper as vodcast_scraper
 
-plugin = Plugin()
-
 STRINGS = {
     'page': 30001,
     'streams': 30100,
@@ -33,6 +31,8 @@ STRINGS = {
     'search': 30200,
     'title': 30201
 }
+
+plugin = Plugin()
 
 
 @plugin.route('/')
