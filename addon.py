@@ -176,8 +176,8 @@ def __format_videos(videos):
         'thumbnail': video['thumbnail'],
         'info': {
             'count': i,
+            'studio': video['duration'],
             'originaltitle': video['title'],
-            'duration': video['duration'],
             'plot': video['description'],
             'date': video['date'],
             'size': video['filesize'],
