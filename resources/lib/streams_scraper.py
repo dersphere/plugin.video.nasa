@@ -17,73 +17,51 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import simplejson as json
-from urllib import urlencode
-from urllib2 import urlopen
+from urllib2 import urlopen, Request
 import re
 
-API_KEY = 'C55C5A3302BF1CA923A7B41A04E5C0F4'  # please don't steal my key
-API_URL = 'http://api.ustream.tv/json/'
+
+RE_CID = re.compile('flashvars: \{"cid":(.+?),')
+STATIC_URL = 'http://sjc-uhls-vip04.ustream.tv/watch/playlist.m3u8?cid=%s'
+STATIC_STREAMS = [
+    {
+        'title': 'Nasa TV HD',
+        'stream_url': ('http://public.infozen.cshls.lldns.net/infozen/public/'
+                       'public/public_1000.m3u8'),
+        'stream_id': None,
+    }, {
+        'title': 'ISS Live Stream',
+        'stream_url': None,
+        'stream_id': 'ISS_LIVE_STREAM',
+    }, {
+        'title': 'Educational Channel HD',
+        'stream_url': ('http://edu.infozen.cshls.lldns.net/infozen/edu/'
+                       'edu/edu_1000.m3u8'),
+        'stream_id': None,
+    }, {
+        'title': 'Media Channel HD',
+        'stream_url': ('http://media.infozen.cshls.lldns.net/infozen/media/'
+                       'media/media_1000.m3u8'),
+        'stream_id': None,
+    },
+]
 
 
-def get_streams(only_live=True):
-    log('get_streams started')
-    path = ('user', 'NASAtelevision', 'listAllChannels')
-    json_data = __ustream_request(path)
-    channels = []
-    for channel in json_data['results']:
-        if only_live and channel['status'] != 'live':
-            continue
-        else:
-            channels.append({
-                'title': channel['title'],
-                'id': channel['id'],
-                'description': channel['description'],
-                'thumbnail': channel['imageUrl']['small']
-            })
-    log('get_streams finished with %d channels' % len(channels))
-    return channels
+def get_streams():
+    return STATIC_STREAMS
 
 
-def get_stream(id):
-    return __generate_rtmp(id)
-
-
-def __ustream_request(path):
-    params = {
-        'key': API_KEY,
-        'limit': 50
-    }
-    url = API_URL + '%s?%s' % ('/'.join(path), urlencode(params))
-    log('__ustream_request opening url=%s' % url)
-    response = urlopen(url).read()
-    log('__ustream_request finished with %d bytes result' % len(response))
-    return json.loads(response)
-
-
-def __generate_rtmp(id):
-    log('__generate_rtmp started with id=%s' % id)
-    amf_url = 'http://cdngw.ustream.tv/Viewer/getStream/1/%s.amf' % id
-    response = urlopen(amf_url).read()
-    tc_url = re.search('rtmp://(.+?)\x00', response).group(1)
-    page_url = re.search('url\W\W\W(.+?)\x00', response).group(1)
-    playpath = re.search('streamName(?:\W+)([^\x00]+)', response).group(1)
-    if tc_url.count('/') > 1:
-        log('__generate_rtmp guessing rtmp without verification')
-        app = tc_url.split('/', 1)[1]
-        swf_url = 'http://www.ustream.tv/flash/viewer.swf'
-        url = (
-            'rtmp://%s playpath=%s swfUrl=%s pageUrl=%s '
-            'app=%s live=1' % (tc_url, playpath, swf_url, page_url, app)
+def get_stream(stream_id):
+    if stream_id == 'ISS_LIVE_STREAM':
+        request = Request('http://www.ustream.tv/channel/live-iss-stream')
+        request.add_header(
+            'User-Agent',
+            ('Mozilla/5.0 (iPad; CPU OS 7_0_4 like Mac OS X) '
+             'AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 '
+             'Mobile/11B554a Safari/9537.53')
         )
+        response = urlopen(request).read()
+        cid = RE_CID.search(response).groups()[0]
+        return STATIC_URL % cid
     else:
-        log('__generate_rtmp guessing rtmp with verification')
-        swf_url = urlopen('http://www.ustream.tv/flash/viewer.swf').geturl()
-        url = ('rtmp://%s playpath=%s swfUrl=%s pageUrl=%s swfVfy=1 live=1'
-               % (tc_url, playpath, swf_url, page_url))
-    log('__generate_rtmp finished with url=%s' % url)
-    return url
-
-
-def log(text):
-    print 'Nasa streams scraper: %s' % text
+        raise NotImplementedError('Unknown stream_id')

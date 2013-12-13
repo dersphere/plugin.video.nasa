@@ -50,19 +50,23 @@ def show_root_menu():
 
 @plugin.route('/streams/')
 def show_streams():
-    items = [{
-        'label': stream['title'],
-        'path': plugin.url_for(
-            endpoint='play_stream',
-            id=stream['id']
-        ),
-        'icon': stream['thumbnail'],
-        'info': {
-            'originaltitle': stream['title'],
-            'plot': stream['description']
-        },
-        'is_playable': True,
-    } for stream in streams_scraper.get_streams()]
+    items = []
+    for stream in streams_scraper.get_streams():
+        if stream.get('stream_url'):
+            items.append({
+                'label': stream['title'],
+                'path': stream['stream_url'],
+                'is_playable': True,
+            })
+        else:
+            items.append({
+                'label': stream['title'],
+                'path': plugin.url_for(
+                    endpoint='play_stream',
+                    id=stream['stream_id']
+                ),
+                'is_playable': True,
+            })
     return plugin.finish(items)
 
 
