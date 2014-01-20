@@ -22,7 +22,7 @@ import re
 
 
 RE_CID = re.compile('flashvars: \{"cid":(.+?),')
-STATIC_URL = 'http://sjc-uhls-vip04.ustream.tv/watch/playlist.m3u8?cid=%s'
+STATIC_URL = 'http://sjc-uhls-proxy.ustream.tv/watch/playlist.m3u8?cid=%s'
 STATIC_STREAMS = [
     {
         'title': 'Nasa TV HD',
