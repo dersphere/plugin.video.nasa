@@ -23,15 +23,13 @@ from xbmcswift2 import Plugin, xbmc
 STRINGS = {
     'page': 30001,
     'streams': 30100,
-    'videos': 30101,
-    'vodcasts': 30103,
-    'search': 30200,
+    'channels': 30101,
     'title': 30201
 }
 
 STATIC_STREAMS = (
     {
-        'title': 'Nasa TV HD',
+        'title': 'NASA TV - Public Channel (HD)',
         'logo': 'public.jpg',
         'stream_url': ('http://public.infozen.cshls.lldns.net/infozen/public/'
                        'public/public_1000.m3u8'),
@@ -41,12 +39,12 @@ STATIC_STREAMS = (
         'stream_url': ('http://sjc-uhls-proxy.ustream.tv/watch/'
                        'playlist.m3u8?cid=9408562'),
     }, {
-        'title': 'Educational Channel HD',
+        'title': 'NASA TV - Educational Channel (HD)',
         'logo': 'edu.jpg',
         'stream_url': ('http://edu.infozen.cshls.lldns.net/infozen/edu/'
                        'edu/edu_1000.m3u8'),
     }, {
-        'title': 'Media Channel HD',
+        'title': 'NASA TV - Media Channel (HD)',
         'logo': 'media.jpg',
         'stream_url': ('http://media.infozen.cshls.lldns.net/infozen/media/'
                        'media/media_1000.m3u8'),
@@ -74,6 +72,10 @@ YOUTUBE_CHANNELS = (
         'name': 'Hubble Space Telescope',
         'logo': 'hubble.jpg',
         'user': 'HubbleSiteChannel',
+    }, {
+        'name': 'NASA ISS',
+        'logo': 'nasa.jpg',
+        'user': 'ReelNASA',
     },
 )
 
