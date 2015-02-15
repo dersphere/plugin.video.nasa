@@ -23,13 +23,15 @@ from xbmcswift2 import Plugin, xbmc
 STRINGS = {
     'page': 30001,
     'streams': 30100,
-    'channels': 30101,
+    'videos': 30101,
+    'vodcasts': 30103,
+    'search': 30200,
     'title': 30201
 }
 
 STATIC_STREAMS = (
     {
-        'title': 'NASA TV - Public Channel (HD)',
+        'title': 'Nasa TV HD',
         'logo': 'public.jpg',
         'stream_url': ('http://public.infozen.cshls.lldns.net/infozen/public/'
                        'public/public_1000.m3u8'),
@@ -39,12 +41,12 @@ STATIC_STREAMS = (
         'stream_url': ('http://sjc-uhls-proxy.ustream.tv/watch/'
                        'playlist.m3u8?cid=9408562'),
     }, {
-        'title': 'NASA TV - Educational Channel (HD)',
+        'title': 'Educational Channel HD',
         'logo': 'edu.jpg',
         'stream_url': ('http://edu.infozen.cshls.lldns.net/infozen/edu/'
                        'edu/edu_1000.m3u8'),
     }, {
-        'title': 'NASA TV - Media Channel (HD)',
+        'title': 'Media Channel HD',
         'logo': 'media.jpg',
         'stream_url': ('http://media.infozen.cshls.lldns.net/infozen/media/'
                        'media/media_1000.m3u8'),
@@ -55,34 +57,32 @@ YOUTUBE_CHANNELS = (
     {
         'name': 'NASA Main',
         'logo': 'nasa.jpg',
+        'channel_id': 'UCLA_DiR1FfKNvjuUpBHmylQ',
         'user': 'NASAtelevision',
     }, {
         'name': 'NASA Goddard',
         'logo': 'goddard.jpg',
+        'channel_id': 'UCAY-SMFNfynqz1bdoaV8BeQ',
         'user': 'NASAexplorer',
     }, {
         'name': 'NASA Jet Propulsion Laboratory',
         'logo': 'jpl.jpg',
+        'channel_id': 'UCryGec9PdUCLjpJW2mgCuLw',
         'user': 'JPLnews',
     }, {
         'name': 'NASA Kennedy Space Center',
         'logo': 'nasa.jpg',
+        'channel_id': 'UCjJtr2fFcUp6yljzJOzpHUg',
         'user': 'NASAKennedy',
     }, {
         'name': 'Hubble Space Telescope',
         'logo': 'hubble.jpg',
+        'channel_id': 'UCqvjEkH_41m4DYaoNQwk4Bw',
         'user': 'HubbleSiteChannel',
-    }, {
-        'name': 'NASA ISS',
-        'logo': 'nasa.jpg',
-        'user': 'ReelNASA',
     },
 )
 
-YOUTUBE_URL = (
-    'plugin://plugin.video.youtube/?'
-    'path=/root&feed=uploads&channel=%s'
-)
+YOUTUBE_URL ='plugin://plugin.video.youtube/channel/%s/?page=1'
 
 plugin = Plugin()
 
@@ -114,7 +114,7 @@ def show_channels():
     items = [{
         'label': channel['name'],
         'thumbnail': get_logo(channel['logo']),
-        'path': YOUTUBE_URL % channel['user'],
+        'path': YOUTUBE_URL % channel['channel_id'],
     } for channel in YOUTUBE_CHANNELS]
     return plugin.finish(items)
 
