@@ -38,8 +38,8 @@ STATIC_STREAMS = (
     }, {
         'title': 'ISS Live Stream',
         'logo': 'iss.jpg',
-        'stream_url': ('http://sjc-uhls-proxy.ustream.tv/watch/'
-                       'playlist.m3u8?cid=9408562'),
+        'stream_url': ('http://iphone-streaming.ustream.tv/ustreamVideo/'
+                       '9408562/streams/live/playlist.m3u8'),
     }, {
         'title': 'Educational Channel HD',
         'logo': 'edu.jpg',
