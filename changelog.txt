@@ -1,3 +1,7 @@
+2.0.2 (14.07.2015)
+  - fixed live streams
+  - added ISS HD Earth Viewing Experiment stream
+
 2.0.1 (15.02.2015)
   - migration to new youtube add-on
   - update translations
