@@ -51,11 +51,15 @@ STATIC_STREAMS = (
         'stream_url': ('http://nasatv-lh.akamaihd.net/i/'
                        'NASA_103@319271/master.m3u8'),
     },{
-        'title': 'ISS HD Earth Viewing',
+        'title': 'ISS HD Earth Viewing - ustream',
         'logo': 'isshd.jpg',
         'stream_url': ('http://iphone-streaming.ustream.tv/uhls/'
                        '17074538/streams/live/iphone/playlist.m3u8'),
-    },
+    },{
+        'title': 'ISS HD Earth Viewing - urthecast HD',
+        'logo': 'isshd.jpg',
+        'stream_url': ('http://d2ai41bknpka2u.cloudfront.net/live/'
+                       'iss.stream_source/playlist.m3u8'),
 )
 
 YOUTUBE_CHANNELS = (
