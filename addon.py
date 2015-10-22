@@ -60,6 +60,7 @@ STATIC_STREAMS = (
         'logo': 'isshd.jpg',
         'stream_url': ('http://d2ai41bknpka2u.cloudfront.net/live/'
                        'iss.stream_source/playlist.m3u8'),
+    },
 )
 
 YOUTUBE_CHANNELS = (
